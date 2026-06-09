@@ -166,29 +166,7 @@ y cuál es su propósito de negocio central. Máximo 5 líneas.]
 
 ---
 
-## 2. STACK TECNOLÓGICO OBLIGATORIO
-
-Todo código generado DEBE usar exclusivamente las siguientes tecnologías.
-Introducir dependencias fuera de esta lista requiere aprobación explícita del equipo.
-
-| Capa | Tecnología | Versión mínima | Origen de la decisión |
-|------|-----------|----------------|-----------------------|
-| Backend / API | [ej: Python + FastAPI] | [ej: Python 3.12 / FastAPI 0.111] | [ADR-ID] |
-| Frontend | [ej: React + Next.js] | [ej: Next.js 14 App Router] | [ADR-ID] |
-| Base de datos principal | [ej: PostgreSQL] | [ej: PostgreSQL 16] | [ADR-ID] |
-| Base de datos documental | [ej: MongoDB] | [ej: 7.x] | [ADR-ID — solo si aplica] |
-| Almacenamiento de archivos | [ej: GCP Cloud Storage] | — | [ADR-ID] |
-| Caché | [ej: Redis] | [ej: 7.x] | [ADR-ID] |
-| Cloud / Infraestructura | [ej: GCP] | — | [ADR-ID] |
-| Contenerización | [ej: Docker + Cloud Run] | — | [ADR-ID] |
-| ORM / Query builder | [ej: SQLAlchemy 2.x / Alembic] | — | [ADR-ID] |
-| Validación de datos | [ej: Pydantic v2] | — | [ADR-ID] |
-| Autenticación | [ej: JWT + OAuth2] | — | [ADR-ID] |
-| Testing | [ej: pytest + httpx] | — | [ADR-ID] |
-
----
-
-## 3. PRINCIPIOS TÉCNICOS NO NEGOCIABLES
+## 2. PRINCIPIOS TÉCNICOS NO NEGOCIABLES
 
 > Cada principio lleva un ID, una regla en imperativo, su origen en el SAD/SRS
 > y la consecuencia de incumplirlo. El agente de IA NUNCA debe violar estos
@@ -217,9 +195,14 @@ EJEMPLO INCORRECTO:
 > · Rendimiento (límites aceptables, estrategia de caché, paginación)
 > · Observabilidad (logging, métricas, trazas distribuidas)
 
+> **Nota:** El stack tecnológico obligatorio NO se define en este prompt.
+> El comando `/speckit-constitution` lo extrae automáticamente del SAD
+> proporcionado como contexto. Este prompt solo codifica los principios,
+> reglas y estándares que aplican **sobre** ese stack.
+
 ---
 
-## 4. REGLAS DE NEGOCIO CRÍTICAS
+## 3. REGLAS DE NEGOCIO CRÍTICAS
 
 > Reglas derivadas directamente del SRS que el agente de código debe conocer
 > para no generar lógica incorrecta. Cada regla es una invariante del dominio.
@@ -231,7 +214,7 @@ EJEMPLO INCORRECTO:
 
 ---
 
-## 5. ESTRUCTURA DE PROYECTO
+## 4. ESTRUCTURA DE PROYECTO
 
 ```
 [Estructura de directorios del proyecto — extraída de la Sección 8 del SAD]
@@ -256,7 +239,7 @@ La capa domain NO DEBE importar de application ni de infrastructure. NUNCA.
 
 ---
 
-## 6. CONVENCIONES DE CÓDIGO
+## 5. CONVENCIONES DE CÓDIGO
 
 > Extraídas directamente de la Sección 8 del SAD y adaptadas al stack confirmado.
 
@@ -277,7 +260,7 @@ La capa domain NO DEBE importar de application ni de infrastructure. NUNCA.
 
 ---
 
-## 7. ESTÁNDARES DE TESTING
+## 6. ESTÁNDARES DE TESTING
 
 | Tipo | Alcance obligatorio | Herramienta | Umbral mínimo | Origen |
 |------|--------------------|-----------  |---------------|--------|
@@ -291,7 +274,7 @@ REGLA: Los mocks de infraestructura solo están permitidos en tests unitarios. L
 
 ---
 
-## 8. SEGURIDAD — REGLAS OBLIGATORIAS
+## 7. SEGURIDAD — REGLAS OBLIGATORIAS
 
 > Derivadas de la Sección 6 del SAD y los RNF de seguridad del SRS.
 
@@ -306,7 +289,7 @@ REGLA: Los mocks de infraestructura solo están permitidos en tests unitarios. L
 
 ---
 
-## 9. GOVERNANCE
+## 8. GOVERNANCE
 
 **Procedimiento de enmienda:**
 1. Proponer cambio mediante Pull Request al archivo `CLAUDE.md`.
@@ -503,7 +486,7 @@ ESTIMACIÓN RELATIVA: XS / S / M / L / XL
 | R5 | **Granularidad correcta** | ¿Cada Spec cubre exactamente una épica? ¿No mezcla responsabilidades de épicas distintas? |
 | R6 | **Invariantes documentadas** | ¿Las reglas de negocio críticas del dominio están en la sección REGLAS DE NEGOCIO de la Constitución Y en la sección correspondiente del Spec? |
 | R7 | **Sin duplicación ambigua** | Si un RNF aparece en la Constitución como PRIN, no debe repetirse en el Spec salvo que el Spec tenga un umbral más específico para esa épica. Documentar explícitamente la diferencia. |
-| R8 | **Stack verificado** | ¿La tabla de stack de la Constitución coincide exactamente con el stack confirmado en el SAD (ADR-01)? No puede haber tecnologías en la Constitución que no estén en el SAD. |
+| R8 | **Sin stack en el prompt** | ¿El prompt de constitución NO incluye una sección de stack tecnológico? El stack lo extrae el comando directamente del SAD. Si aparece una tabla de tecnologías en el prompt, eliminarla. |
 
 ---
 
@@ -511,7 +494,7 @@ ESTIMACIÓN RELATIVA: XS / S / M / L / XL
 
 SITUACIÓN → ACCIÓN DEL AGENTE
 
-El SAD no confirma el stack final (ADRs en estado "Propuesto") → Escribir la Constitución con el stack propuesto y marcar cada tecnología pendiente con `[PENDIENTE DE VALIDACIÓN — ADR-ID]`. Registrar en Sección D como gap crítico que bloquea el cierre de la Constitución. No generar los Specs hasta que el stack esté validado o el usuario lo confirme explícitamente.
+El SAD no confirma el stack final (ADRs en estado "Propuesto") → No incluir el stack en el prompt de constitución. Registrar en Sección E como gap crítico indicando que el comando `/speckit-constitution` necesita el SAD con ADRs en estado "Aceptado" para generar correctamente la sección de stack. No generar los prompts de Spec hasta que el stack esté validado o el usuario lo confirme explícitamente.
 
 Una HU del SRS tiene criterios de aceptación contradictorios con un ADR del SAD → Documentar la contradicción en la Sección D. Escribir el RF del Spec según el SRS (fuente de verdad de negocio) y añadir una nota explícita: "CONFLICTO CON ADR-[ID]: requiere resolución del equipo técnico antes de implementar." No elegir una versión sin validación.
 
